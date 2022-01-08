@@ -1,71 +1,67 @@
-import Note from "./component/Note";
-import { useState } from 'react';
+import React, { useState } from 'react';
+import Filter from './component/Filter';
+import Form from './component/Form';
+import Content from './component/Content';
 
-const DUMMY_Notes = [
-    {
-      id: 1,
-      content: 'HTML is easy',
-      date: '2019-05-30T17:30:31.098Z',
-      important: true
-    },
-    {
-      id: 2,
-      content: 'Browser can execute only JavaScript',
-      date: '2019-05-30T18:39:34.091Z',
-      important: false
-    },
-    {
-      id: 3,
-      content: 'GET and POST are the most important methods of HTTP protocol',
-      date: '2019-05-30T19:20:14.298Z',
-      important: true
-    }
-]
+const App = () => {
+  const [persons, setPersons] = useState([
+    { name: 'Arto Hellas', phone: '040-123456', id: 1 },
+    { name: 'Ada Lovelace', phone: '39-44-5323523', id: 2 },
+    { name: 'Dan Abramov', phone: '12-43-234345', id: 3 },
+    { name: 'Mary Poppendieck', phone: '39-23-6423122', id: 4 }
+  ]);
+  const [name, setName] = useState('');
+  const [phoneNo, setPhoneNo] = useState('');
+  const [filter, setFilter] = useState('');
+  const [filteredList, setFilteredList] = useState(persons);
 
-function App() {
-
-  const [notes, setNotes] = useState(DUMMY_Notes);
-  const [newNote, setNewNote] = useState('');
-  const [showAll, setShowAll] = useState(true);
-
-  const addItem = (event) => {
+  const formSubmitHandler = (event) => {
     event.preventDefault();
+    
+    const newPerson = {
+      id: persons[persons.length - 1].id + 1,
+      name: name,
+      phone: phoneNo
+    };
 
-    const noteObject = {
-      content: newNote,
-      date: new Date().toISOString(),
-      important: Math.random() < 0.5,
-      id: notes.length + 1,
-    }  
+    const doesExists = persons.find(person => person.name === name);
 
-    setNotes(notes.concat(noteObject));
-    setNewNote('');
+    if(doesExists) {
+      alert(`${name} already exists!`);
+      return;
+    };
+
+    setPersons(persons.concat(newPerson));
+    setName('');
+    setPhoneNo('');
   };
 
-  const inputHandler = (event) => {
+  const inputNameHandler = (event) => {
     event.preventDefault();
-    setNewNote(event.target.value);
+    setName(event.target.value);
   };
 
-  const notesToShow = showAll ? notes : notes.filter(note => note.important);
+  const inputPhoneNoHandler = (event) => {
+    event.preventDefault();
+    setPhoneNo(event.target.value);
+  };
 
-    return (
-      <div>
-        <h1>Notes</h1>
-        <div>
-          <button onClick={() => {setShowAll(!showAll)}}>show {showAll ? 'important' : 'all'}</button>
-        </div>
-        <ul>
-            {notesToShow.map((note) => {
-              return <Note key={note.id} note={note} />
-            })} 
-        </ul>
-        <form onSubmit={addItem}>
-            <input value={newNote} onChange={inputHandler} placeholder="write something new..."/>
-            <button type="submit">save</button>
-        </form>
-      </div>
-    );
+  const inputFilterHandler = (event) => {
+    setFilter(event.target.value);
+    const regex = new RegExp(filter, 'i' );
+    const filteredItemList = persons.filter(person => person.name.match(regex));
+    setFilteredList(filteredItemList);
+  };
+
+  return (
+    <div>
+      <h2>Phonebook</h2>
+      <Filter onChange={inputFilterHandler} value={filter} />
+      <Form onSubmit={formSubmitHandler} newName={name} newPhoneNo={phoneNo} inputNameHandler={inputNameHandler} inputPhoneNoHandler={inputPhoneNoHandler} />
+      <h2>Numbers</h2>
+      <Content filtered={filteredList} allPersonList={persons}/>
+    </div>
+  )
 }
 
-export default App;
+export default App
