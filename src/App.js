@@ -1,37 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Filter from './component/Filter';
 import Form from './component/Form';
 import Content from './component/Content';
+import axios from 'axios';
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', phone: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', phone: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', phone: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', phone: '39-23-6423122', id: 4 }
-  ]);
+  const [notes, setNotes] = useState([]);
   const [name, setName] = useState('');
   const [phoneNo, setPhoneNo] = useState('');
   const [filter, setFilter] = useState('');
-  const [filteredList, setFilteredList] = useState(persons);
+  const [filteredList, setFilteredList] = useState(notes);
 
   const formSubmitHandler = (event) => {
     event.preventDefault();
     
-    const newPerson = {
-      id: persons[persons.length - 1].id + 1,
+    const newNote = {
+      id: notes[notes.length - 1].id + 1,
       name: name,
       phone: phoneNo
     };
 
-    const doesExists = persons.find(person => person.name === name);
+    const doesExists = notes.find(note => note.content === name);
 
     if(doesExists) {
       alert(`${name} already exists!`);
       return;
     };
 
-    setPersons(persons.concat(newPerson));
+    setNotes(notes.concat(newNote));
     setName('');
     setPhoneNo('');
   };
@@ -47,11 +43,24 @@ const App = () => {
   };
 
   const inputFilterHandler = (event) => {
-    setFilter(event.target.value);
-    const regex = new RegExp(filter, 'i' );
-    const filteredItemList = persons.filter(person => person.name.match(regex));
+    const typed = event.target.value;
+    
+    setFilter(typed);
+    const filteredItemList = notes.filter(note => note.content.toLowerCase().includes(typed.toLowerCase()));
     setFilteredList(filteredItemList);
   };
+
+  const hook = () => {
+    axios
+    .get('http://localhost:3001/notes')
+    .then(response => {
+      const notes = response.data;
+      setNotes(notes);
+      console.log(notes);
+    });
+  }
+
+  useEffect(hook, []);
 
   return (
     <div>
@@ -59,7 +68,7 @@ const App = () => {
       <Filter onChange={inputFilterHandler} value={filter} />
       <Form onSubmit={formSubmitHandler} newName={name} newPhoneNo={phoneNo} inputNameHandler={inputNameHandler} inputPhoneNoHandler={inputPhoneNoHandler} />
       <h2>Numbers</h2>
-      <Content filtered={filteredList} allPersonList={persons}/>
+      <Content filtered={filteredList} allNotes={notes}/>
     </div>
   )
 }

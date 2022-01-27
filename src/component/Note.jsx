@@ -1,8 +1,9 @@
 function Note(props) {
 
-    const { id, name, phone } = props.note;
+    const { id, content } = props.note;
+
     return (
-        <li key={id}>{name}, {phone}</li>
+        <li key={id}>{content}</li>
     );
 }
 
