@@ -1,6 +1,11 @@
-function List({ id, name }) {
+function List(props) {
+
+    function showClick() {
+        props.showClicked(props.id);
+    }
+
     return (
-        <li key={id}>{name}</li>
+        <li key={props.id}>{props.name}<button onClick={showClick}>Show</button></li>
     );
 }
 

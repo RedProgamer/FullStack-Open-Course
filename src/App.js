@@ -33,10 +33,10 @@ const App = () => {
 
   return (
     <Fragment>
-      {!isLoaded && <p>Loading data!</p>}
+      {!isLoaded && <h1>Loading data...</h1>}
       {isLoaded && <>
         <Search onChange={inputHandler} value={input} />
-        <Content filteredList={filtered} />
+        <Content filteredList={filtered} setCountry={setFiltered}/>
       </> }
     </Fragment>
   )
